@@ -13,6 +13,8 @@
   --dark: #1a1a1a;
   --light: #ecf0f1;
   --gray: #95a5a6;
+  --client: #2471a3;
+  --client-light: #3498db;
 }
 
 html {
@@ -450,5 +452,140 @@ footer {
 
   main {
     margin: 1rem auto;
+  }
+}
+
+/* ── Login Portals ── */
+.login-portals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 860px;
+  margin: 0 auto 2rem;
+}
+
+.login-portal {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.login-portal:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.login-portal-header {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: white;
+}
+
+.login-portal.client .login-portal-header {
+  background: linear-gradient(135deg, var(--client) 0%, var(--client-light) 100%);
+}
+
+.login-portal.enterprise .login-portal-header {
+  background: linear-gradient(135deg, var(--primary) 0%, #2d5f3f 100%);
+}
+
+.login-portal-icon {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.login-portal-header h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-portal-header p {
+  font-size: 0.9rem;
+  opacity: 0.88;
+  margin: 0;
+}
+
+.login-portal-body {
+  padding: 1.75rem 1.5rem 1.5rem;
+}
+
+.login-portal.client .btn-portal {
+  background: linear-gradient(135deg, var(--client), var(--client-light));
+  color: white;
+  width: 100%;
+  border: none;
+}
+
+.login-portal.client .btn-portal:hover {
+  background: linear-gradient(135deg, #1a5f8a, var(--client));
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(36, 113, 163, 0.35);
+}
+
+.login-portal.enterprise .btn-portal {
+  background: linear-gradient(135deg, var(--primary), #2d5f3f);
+  color: white;
+  width: 100%;
+  border: none;
+}
+
+.login-portal.enterprise .btn-portal:hover {
+  background: linear-gradient(135deg, #112e1c, var(--primary));
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(26, 71, 42, 0.35);
+}
+
+.admin-link {
+  background: none;
+  border: none;
+  color: var(--gray);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.2s;
+}
+
+.admin-link:hover {
+  color: var(--dark);
+}
+
+/* ── Role Badges ── */
+.badge-role {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+
+.badge-role-client {
+  background: rgba(52, 152, 219, 0.18);
+  color: var(--client);
+  border: 1px solid rgba(52, 152, 219, 0.35);
+}
+
+.badge-role-enterprise {
+  background: rgba(39, 174, 96, 0.18);
+  color: var(--success);
+  border: 1px solid rgba(39, 174, 96, 0.35);
+}
+
+.badge-role-admin {
+  background: rgba(231, 76, 60, 0.18);
+  color: var(--danger);
+  border: 1px solid rgba(231, 76, 60, 0.35);
+}
+
+@media (max-width: 600px) {
+  .login-portals {
+    grid-template-columns: 1fr;
   }
 }

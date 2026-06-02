@@ -43,14 +43,27 @@ class AssekTrust {
   renderPage(page) {
     this.currentPage = page;
     const root = document.getElementById('root');
-    
-    if (!this.currentUser && page !== 'login' && page !== 'home') {
+
+    if (!this.currentUser && page !== 'login' && page !== 'home' && page !== 'companies') {
       this.renderPage('login');
       return;
     }
 
+    // Enterprise/Admin-only pages
+    if (this.currentUser && this.currentUser.role === 'client' &&
+        ['payments', 'subscribe', 'admin'].includes(page)) {
+      this.renderPage('companies');
+      return;
+    }
+
+    // Admin-only page
+    if (page === 'admin' && (!this.currentUser || this.currentUser.role !== 'admin')) {
+      this.renderPage(this.currentUser ? 'home' : 'login');
+      return;
+    }
+
     let content = '';
-    
+
     switch(page) {
       case 'home':
         content = this.renderHome();
@@ -82,6 +95,38 @@ class AssekTrust {
   }
 
   renderHeader() {
+    let navLinks = '';
+    let roleBadge = '';
+
+    if (!this.currentUser) {
+      navLinks = `
+        <li><a data-page="home">Accueil</a></li>
+        <li><a data-page="companies">Entreprises</a></li>
+      `;
+    } else if (this.currentUser.role === 'client') {
+      roleBadge = '<span class="badge-role badge-role-client">Client</span>';
+      navLinks = `
+        <li><a data-page="home">Accueil</a></li>
+        <li><a data-page="companies">Entreprises Certifiées</a></li>
+        <li><a data-page="profile">Mon Compte</a></li>
+      `;
+    } else if (this.currentUser.role === 'enterprise') {
+      roleBadge = '<span class="badge-role badge-role-enterprise">Entreprise</span>';
+      navLinks = `
+        <li><a data-page="home">Accueil</a></li>
+        <li><a data-page="profile">Mon Profil</a></li>
+        <li><a data-page="payments">Mes Paiements</a></li>
+        <li><a data-page="subscribe">S'abonner</a></li>
+      `;
+    } else if (this.currentUser.role === 'admin') {
+      roleBadge = '<span class="badge-role badge-role-admin">Admin</span>';
+      navLinks = `
+        <li><a data-page="home">Accueil</a></li>
+        <li><a data-page="companies">Entreprises</a></li>
+        <li><a data-page="admin">Panel Admin</a></li>
+      `;
+    }
+
     return `
       <header>
         <div class="header-container">
@@ -91,19 +136,12 @@ class AssekTrust {
           </div>
           <nav>
             <ul class="nav-links">
-              <li><a data-page="home">Accueil</a></li>
-              <li><a data-page="companies">Entreprises</a></li>
-              <li><a data-page="subscribe">S'abonner</a></li>
-              ${this.currentUser ? `
-                ${this.currentUser.role === 'admin' ? `<li><a data-page="admin">Admin</a></li>` : ''}
-                <li><a data-page="payments">Paiements</a></li>
-                <li><a data-page="profile">Profil</a></li>
-              ` : ''}
+              ${navLinks}
             </ul>
           </nav>
           <div class="user-menu">
             ${this.currentUser ? `
-              <span>${this.currentUser.email}</span>
+              <span style="font-size: 0.9rem;">${roleBadge}${this.currentUser.email}</span>
               <button class="btn btn-danger" id="logout-btn">Déconnexion</button>
             ` : `
               <button class="btn btn-primary" data-page="login">Connexion</button>
@@ -166,39 +204,61 @@ class AssekTrust {
     return `
       ${this.renderHeader()}
       <main>
-        <div style="max-width: 400px; margin: 3rem auto;">
-          <div class="card">
-            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary);">Connexion</h2>
-            
-            <div class="alert alert-info">
-              <span>👤</span>
-              <div>
-                <strong>Connexion Utilisateur</strong>
-                <p>Utilisez votre email pour vous connecter</p>
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+          <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">Bienvenue sur AssekTrust</h2>
+          <p style="color: #7f8c8d; font-size: 1.05rem;">Choisissez votre espace de connexion</p>
+        </div>
+
+        <div class="login-portals">
+
+          <!-- Espace Client -->
+          <div class="login-portal client">
+            <div class="login-portal-header">
+              <span class="login-portal-icon">👤</span>
+              <h3>Espace Client</h3>
+              <p>Vérifiez et consultez les entreprises certifiées au Gabon</p>
+            </div>
+            <div class="login-portal-body">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="client-login-email" placeholder="votre@email.com">
               </div>
-            </div>
-
-            <div class="form-group">
-              <label>Email</label>
-              <input type="email" id="login-email" placeholder="votre@email.com">
-            </div>
-
-            <div class="form-group">
-              <label>Mot de passe</label>
-              <input type="password" id="login-password" placeholder="••••••••">
-            </div>
-
-            <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" id="login-btn">
-              Se Connecter
-            </button>
-
-            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #ecf0f1;">
-              <p style="margin-bottom: 1rem; color: var(--primary); font-weight: 600;">Administrateur ?</p>
-              <button class="btn btn-secondary" style="width: 100%;" id="admin-login-btn">
-                🔐 Connexion Admin
+              <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="client-login-password" placeholder="••••••••">
+              </div>
+              <button class="btn btn-portal" id="client-login-btn" style="width: 100%; background: linear-gradient(135deg, var(--client), var(--client-light)); color: white; border: none;">
+                👤 Se Connecter en tant que Client
               </button>
             </div>
           </div>
+
+          <!-- Espace Entreprise -->
+          <div class="login-portal enterprise">
+            <div class="login-portal-header">
+              <span class="login-portal-icon">🏢</span>
+              <h3>Espace Entreprise</h3>
+              <p>Gérez votre certification et vos abonnements AssekTrust</p>
+            </div>
+            <div class="login-portal-body">
+              <div class="form-group">
+                <label>Email de l'entreprise</label>
+                <input type="email" id="enterprise-login-email" placeholder="contact@entreprise.com">
+              </div>
+              <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="enterprise-login-password" placeholder="••••••••">
+              </div>
+              <button class="btn btn-portal" id="enterprise-login-btn" style="width: 100%; background: linear-gradient(135deg, var(--primary), #2d5f3f); color: white; border: none;">
+                🏢 Se Connecter en tant qu'Entreprise
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="text-align: center; margin-top: 1rem;">
+          <button class="admin-link" id="admin-login-btn">🔐 Accès Administrateur</button>
         </div>
       </main>
     `;
@@ -537,13 +597,46 @@ class AssekTrust {
   renderProfile() {
     if (!this.currentUser) return this.renderLogin();
 
+    if (this.currentUser.role === 'client') {
+      return `
+        ${this.renderHeader()}
+        <main>
+          <div style="max-width: 500px; margin: 2rem auto;">
+            <section>
+              <h2>Mon Compte Client</h2>
+              <div class="card">
+                <div class="alert alert-info" style="margin-bottom: 1.5rem;">
+                  <span>👤</span>
+                  <div>
+                    <strong>Espace Client</strong><br>
+                    Vous êtes connecté en tant que client. Consultez les entreprises certifiées avant d'effectuer vos achats.
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" value="${this.currentUser.email}" disabled>
+                </div>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" data-page="companies">
+                  🔍 Voir les Entreprises Certifiées
+                </button>
+                <button class="btn btn-danger" style="width: 100%;" id="logout-btn">
+                  🚪 Déconnexion
+                </button>
+              </div>
+            </section>
+          </div>
+        </main>
+      `;
+    }
+
+    // Enterprise profile
     return `
       ${this.renderHeader()}
       <main>
         <div style="max-width: 600px; margin: 2rem auto;">
           <section>
-            <h2>Mon Profil</h2>
-            
+            <h2>Mon Profil Entreprise</h2>
+
             <div class="card">
               <div class="form-group">
                 <label>Email</label>
@@ -574,7 +667,7 @@ class AssekTrust {
 
               <div class="form-group">
                 <label>Réseaux sociaux (séparés par des virgules)</label>
-                <input type="text" value="${(this.currentUser.networks || []).join(', ')}" id="networks" 
+                <input type="text" value="${(this.currentUser.networks || []).join(', ')}" id="networks"
                   placeholder="Facebook, Instagram, WhatsApp, Twitter">
               </div>
 
@@ -615,16 +708,16 @@ class AssekTrust {
     });
 
     if (page === 'login') {
-      document.getElementById('login-btn')?.addEventListener('click', () => {
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
+      // Client login
+      document.getElementById('client-login-btn')?.addEventListener('click', () => {
+        const email = document.getElementById('client-login-email').value;
+        const password = document.getElementById('client-login-password').value;
+
         if (email && password) {
           this.currentUser = {
-            id: 'user-' + Date.now(),
+            id: 'client-' + Date.now(),
             email: email,
-            role: 'user',
-            networks: []
+            role: 'client'
           };
           this.saveToStorage();
           this.renderPage('companies');
@@ -633,9 +726,28 @@ class AssekTrust {
         }
       });
 
+      // Enterprise login
+      document.getElementById('enterprise-login-btn')?.addEventListener('click', () => {
+        const email = document.getElementById('enterprise-login-email').value;
+        const password = document.getElementById('enterprise-login-password').value;
+
+        if (email && password) {
+          this.currentUser = {
+            id: 'enterprise-' + Date.now(),
+            email: email,
+            role: 'enterprise',
+            networks: []
+          };
+          this.saveToStorage();
+          this.renderPage('profile');
+        } else {
+          alert('Veuillez remplir tous les champs');
+        }
+      });
+
       document.getElementById('admin-login-btn')?.addEventListener('click', () => {
         const adminPassword = prompt('Mot de passe administrateur:');
-        
+
         // ✅ Vérification stricte du mot de passe admin
         if (adminPassword === this.adminPassword) {
           this.currentUser = {

@@ -1,6 +1,6 @@
 # AssekTrust - Plateforme de Certification d'Entreprises 🛡️
 
-Combattez les arnaqués en ligne au Gabon! AssekTrust est une Progressive Web App (PWA) qui permet aux entreprises de se faire certifier et aux clients de vérifier leur authenticité avant d'acheter sur les réseaux sociaux.
+Combattez les arnaques en ligne au Gabon! AssekTrust est une Progressive Web App (PWA) qui permet aux entreprises de se faire certifier et aux clients de vérifier leur authenticité avant d'acheter sur les réseaux sociaux.
 
 ## ✨ Fonctionnalités Principales
 
@@ -129,4 +129,4 @@ MIT License - Libre d'utilisation
 
 ---
 
-**Fait avec ❤️ au Gabon 🇬🇦 | Combattons les arnaqués en ligne ensemble!**
+**Fait avec ❤️ au Gabon 🇬🇦 | Combattons les arnaques en ligne ensemble!**

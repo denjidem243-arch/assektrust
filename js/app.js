@@ -5,6 +5,7 @@ class AssekTrust {
     this.companies = [];
     this.payments = [];
     this.adminEmail = 'denjidem243@gmail.com';
+    this.adminPassword = 'AssekTrust2420'; // ✅ Mot de passe admin sécurisé
     this.init();
   }
 
@@ -635,7 +636,8 @@ class AssekTrust {
       document.getElementById('admin-login-btn')?.addEventListener('click', () => {
         const adminPassword = prompt('Mot de passe administrateur:');
         
-        if (adminPassword) {
+        // ✅ Vérification stricte du mot de passe admin
+        if (adminPassword === this.adminPassword) {
           this.currentUser = {
             id: 'admin-' + Date.now(),
             email: this.adminEmail,
@@ -644,7 +646,7 @@ class AssekTrust {
           this.saveToStorage();
           this.renderPage('admin');
         } else {
-          alert('Accès administrateur refusé');
+          alert('❌ Mot de passe administrateur incorrect!');
         }
       });
     }
